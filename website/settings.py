@@ -85,9 +85,13 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# Get DATABASE_URL from environment variable
 database_url = os.environ.get("DATABASE_URL")
 
-DATABASES["default"] = dj_database_url.parse("DATABASE_URL")
+# If DATABASE_URL is set, overwrite the default database configuration
+if database_url:
+    DATABASES['default'] = dj_database_url.parse(database_url)
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
