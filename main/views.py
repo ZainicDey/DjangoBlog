@@ -56,7 +56,7 @@ def post(request):
         form = PostForm()
         return render(request, 'post.html', {'form': form})
 
-@login_required
+@login_required(login_url='/login')
 def like_post(request, post_id):
     post = models.Post.objects.filter(id=post_id).first()
     existing_like = models.Like.objects.filter(user=request.user, post=post).first()
@@ -68,7 +68,7 @@ def like_post(request, post_id):
 
     return redirect('home')
 
-@login_required
+@login_required(login_url='/login')
 def comment_post(request, post_id):
     post = models.Post.objects.filter(id=post_id).first()   
     if not post:
@@ -93,7 +93,7 @@ def comment_post(request, post_id):
         "form": form,
     })
 
-@login_required
+@login_required(login_url='/login')
 def comment_delete(request, comment_id):
     comment = models.Comment.objects.filter(id=comment_id).first()
 
@@ -102,19 +102,23 @@ def comment_delete(request, comment_id):
     
     return redirect('comment_post', post_id=comment.post.id)
 
-@login_required
+@login_required(login_url='/login')
 def edit_comment(request, comment_id):
     comment = models.Comment.objects.filter(id=comment_id).first()
-    
+    current_content = comment.content
+    print(comment.content)
     if not comment:
-        return HttpResponseNotFound('Some error')
+        return HttpResponseNotFound('Comment not found')
 
     if request.method == "POST":
         form = CommentForm(request.POST, instance=comment) 
         if form.is_valid():
-            new_content = form.cleaned_data.get('content')
-            if new_content != comment.content:
+            new_content = form.cleaned_data.get('content').strip() 
+            if new_content != current_content:
                 form.save()
+                print("Comment updated successfully.")
+            else:
+                print("No changes detected. Comment not updated.")
             return redirect('comment_post', comment.post.id)  
     else:
         form = CommentForm(instance=comment)  
