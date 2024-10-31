@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Comment section{% endblock %}
+{% block content %}
+<style>
+    .comment {
+        border: 1px solid #ccc;
+        padding-left: 15px;
+        padding-top: 15px;
+        margin: 10px;
+    }
+    .edited-comment {
+        width: auto;                      /* Set width to auto to adjust based on content */
+        font-size: 0.85em;                /* Decrease font size for a smaller appearance */
+        font-style: italic;               /* Make the text italic */
+        font-weight: 400;                 /* Set font weight to normal */
+        color: #6c757d;                   /* Use a suitable muted color (Bootstrap's gray) */
+        border: 1px solid rgba(108, 117, 125, 0.1); /* Gray with 50% opacity */
+        border-radius: 10px;
+        padding: 2px 4px;                /* Decrease padding for a smaller look */
+        margin-top: 5px;                 /* Optional: Add some margin for spacing */
+    }
+</style>
+<div class="card mt-2">
+    <div class="card-header">
+        <strong>{{ post.author.username }}</strong>
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">{{ post.title }}</h5>
+        <p>{{ post.description|linebreaks }}</p>
+    </div>
+    <div class="card-footer">
+        <!-- Comment Form -->
+        <div>
+            <form method="POST" action="{% url 'comment_post' post.id %}" class="mb-3">
+                {% csrf_token %}
+                <div class="form-group">
+                    <textarea name="content" placeholder="Add a comment..." required class="form-control" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mt-2">Comment</button>
+            </form>
+        </div>
+
+        <!-- Display Comments -->
+        <div class="comments mt-3">
+            <h6>Comments:</h6>
+            {% for comment in comments %}
+                <div class="comment mb-2">
+                    <p>
+                        <strong>{{ comment.author.username }}:</strong> {{ comment.content }}
+                        {% if comment.created_at != comment.updated_at %}
+                            <span   span class="text-muted edited-comment">edited</span>
+                        {% endif %}
+                        {% if request.user == comment.author %}
+                            <a href="{% url 'edit_comment' comment.id %}" style="color: blue; text-decoration: none;">Edit</a>
+                            <a href="{% url 'comment_delete' comment.id %}" style="color: red; text-decoration: none;">Delete</a>
+                        {% endif %}
+                    </p>
+                </div>
+            {% empty %}
+                <p>No comments yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
