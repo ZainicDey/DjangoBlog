@@ -27,3 +27,5 @@ class Comment(models.Model):
     is_edited = models.BooleanField(default=False)
     def __str__(self):
         return f'{self.author.username} - {self.content}'
+    class Meta:
+        ordering = ['id']
