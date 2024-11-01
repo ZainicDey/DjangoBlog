@@ -47,7 +47,7 @@
                 <div class="comment mb-2">
                     <p>
                         <strong>{{ comment.author.username }}:</strong> {{ comment.content }}
-                        {% if comment.created_at|date:"U" != comment.updated_at|date:"U" %}
+                        {% if comment.is_edited %}
                             <span class="text-muted edited-comment">edited</span>
                         {% endif %}
                         {% if request.user == comment.author %}

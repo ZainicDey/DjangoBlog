@@ -24,6 +24,6 @@ class Comment(models.Model):
     content = models.TextField()
     created_at = models.TimeField(auto_now_add=True, null=True)
     updated_at = models.TimeField(auto_now=True, null=True) 
-
+    is_edited = models.BooleanField(default=False)
     def __str__(self):
         return f'{self.author.username} - {self.content}'

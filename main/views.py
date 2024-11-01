@@ -85,7 +85,6 @@ def comment_post(request, post_id):
             comment = form.save(commit=False)
             comment.author = request.user 
             comment.post = post
-            comment.updated_at = comment.created_at
             comment.save()
             return redirect('comment_post', post_id=post.id)
     else:
@@ -106,25 +105,37 @@ def comment_delete(request, comment_id):
     
     return redirect('comment_post', post_id=comment.post.id)
 
+from django.utils import timezone
+from django.http import HttpResponseNotFound
+from django.shortcuts import redirect, render
+from django.contrib.auth.decorators import login_required
+
 @login_required(login_url='/login')
 def edit_comment(request, comment_id):
     comment = models.Comment.objects.filter(id=comment_id).first()
-    current_content = comment.content
-    print(comment.content)
+
     if not comment:
         return HttpResponseNotFound('Comment not found')
+
+    current_content = comment.content.strip()
 
     if request.method == "POST":
         form = CommentForm(request.POST, instance=comment) 
         if form.is_valid():
-            new_content = form.cleaned_data.get('content').strip() 
+            new_content = form.cleaned_data.get('content').strip()
+
+            # Check if there are changes
             if new_content != current_content:
-                form.save()
+                comment.content = new_content
+                comment.updated_at = timezone.now() 
+                comment.is_edited = True 
+                comment.save()  
                 print("Comment updated successfully.")
             else:
                 print("No changes detected. Comment not updated.")
+
             return redirect('comment_post', comment.post.id)  
     else:
-        form = CommentForm(instance=comment)  
+        form = CommentForm(instance=comment)
 
     return render(request, 'edit_comment.html', {'form': form})
