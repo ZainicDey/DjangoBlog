@@ -47,8 +47,8 @@
                 <div class="comment mb-2">
                     <p>
                         <strong>{{ comment.author.username }}:</strong> {{ comment.content }}
-                        {% if comment.created_at != comment.updated_at %}
-                            <span   span class="text-muted edited-comment">edited</span>
+                        {% if comment.created_at|date:"U" != comment.updated_at|date:"U" %}
+                            <span class="text-muted edited-comment">edited</span>
                         {% endif %}
                         {% if request.user == comment.author %}
                             <a href="{% url 'edit_comment' comment.id %}" style="color: blue; text-decoration: none;">Edit</a>

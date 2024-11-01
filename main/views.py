@@ -17,26 +17,29 @@ def home(request):
             post.delete()
         return redirect('/home')
     posts = models.Post.objects.annotate(
-        likes_count=Count('likes', distinct=True),
-        comments_count=Count('comments', distinct=True)
-    )
+    likes_count=Count('likes', distinct=True),
+    comments_count=Count('comments', distinct=True)
+    ).order_by('-created_at')
 
     return render(request, 'home.html', {'posts': posts})
 
 def signup(request):
-    if request.method=='POST':
+    if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('/home')
+            email = form.cleaned_data.get('email')
+            if models.User.objects.filter(email=email).exists():
+                form.add_error('email', "An account with this email already exists.")
+            else:
+                user = form.save()
+                login(request, user)
+                return redirect('/home')
     elif request.user.is_authenticated:
         messages.info(request, "You need to log out to create a new account.")  
         return redirect('/home')
     else:
         form = RegisterForm()
-
-    return render(request, 'registration/sign_up.html', {'form' : form})
+    return render(request, 'registration/sign_up.html', {'form': form})
 
 class CustomLoginView(LoginView):
     def dispatch(self, request):
