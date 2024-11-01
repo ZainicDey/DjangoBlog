@@ -82,6 +82,7 @@ def comment_post(request, post_id):
             comment = form.save(commit=False)
             comment.author = request.user 
             comment.post = post
+            comment.updated_at = comment.created_at
             comment.save()
             return redirect('comment_post', post_id=post.id)
     else:
