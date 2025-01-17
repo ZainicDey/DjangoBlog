@@ -62,7 +62,7 @@ import dj_database_url  # Make sure to import this at the top
 
 DATABASES = {
     'default': dj_database_url.parse(
-        "postgresql://django_first_user:dMRakah2i24J4q6z4dNmDwS9sJHKWyKL@dpg-csccp688fa8c73fu8s60-a.oregon-postgres.render.com/django_first"
+        "postgresql://blogdb_owner:wD5VeuSsmIk3@ep-small-rain-a8izjin6.eastus2.azure.neon.tech/blogdb?sslmode=require"
     )
 }
 
